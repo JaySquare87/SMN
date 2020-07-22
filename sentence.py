@@ -7,7 +7,7 @@ from cleantext import clean
 nlp = spacy.load('en_core_web_lg')
 
 roots = Queue()
-ling_signs = ['i', 'you', 'he', 'she', 'they', 'it', 'him', 'her', 'their', 'those', 'them']
+ling_signs = ['i', 'you', 'he', 'she', 'they', 'it', 'him', 'her', 'their', 'those', 'them', 'who', 'whome', 'whose']
 
 class sentence:
 
@@ -54,11 +54,15 @@ class sentence:
         verb_who = {}
         for verb in self.narration:
             who = []
+            temp = []
             for child in verb.children:
-                if 'sub' in child.dep_:
-                    who.append(child)
-                    who.extend([child.text for child in child.children ])
-            verb_who[verb] = who
+                if 'sub' in child.dep_ or 'aux' in child.dep_:
+                    who.append([branch.text for branch in child.subtree])
+            for child in verb.children:
+                if child.text in who:
+                    temp.append(child)
+
+            verb_who[verb] = temp
         return verb_who
 
     def get_details(self):
